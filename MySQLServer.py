@@ -1,37 +1,77 @@
+# MySQLServer.py
+
 import mysql.connector
 from mysql.connector import Error
 
 def create_database():
     try:
-        # Connect to MySQL server without username and password
+        # Establish a connection to the MySQL server
         connection = mysql.connector.connect(
-            host='localhost'
+            host='localhost',  # or your MySQL server host
+            user='your_username',  # replace with your MySQL username
+            password='your_password'  # replace with your MySQL password
         )
 
         if connection.is_connected():
             cursor = connection.cursor()
-
+            
             # Create the database if it doesn't exist
             cursor.execute("CREATE DATABASE IF NOT EXISTS alx_book_store")
-            print("Database 'alx_book_store' created successfully!")
-
-            # Switch to the newly created database
             cursor.execute("USE alx_book_store")
-
-            # Read and execute the SQL file
-            with open("alx_book_store.sql", "r") as sql_file:
-                sql_commands = sql_file.read().split(';')  # Split commands by semicolon
-                for command in sql_commands:
-                    if command.strip():  # Skip empty commands
-                        cursor.execute(command)
-
-            print("Tables and schema created successfully from 'alx_book_store.sql'!")
-
+            
+            # Create tables
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Authors (
+                    author_id INT AUTO_INCREMENT PRIMARY KEY,
+                    author_name VARCHAR(215) NOT NULL
+                )
+            """)
+            
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Books (
+                    book_id INT AUTO_INCREMENT PRIMARY KEY,
+                    title VARCHAR(130) NOT NULL,
+                    author_id INT,
+                    price DOUBLE,
+                    publication_date DATE,
+                    FOREIGN KEY (author_id) REFERENCES Authors(author_id)
+                )
+            """)
+            
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Customers (
+                    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+                    customer_name VARCHAR(215) NOT NULL,
+                    email VARCHAR(215) NOT NULL,
+                    address TEXT
+                )
+            """)
+            
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Orders (
+                    order_id INT AUTO_INCREMENT PRIMARY KEY,
+                    customer_id INT,
+                    order_date DATE,
+                    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
+                )
+            """)
+            
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Order_Details (
+                    orderdetailid INT AUTO_INCREMENT PRIMARY KEY,
+                    order_id INT,
+                    book_id INT,
+                    quantity DOUBLE,
+                    FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+                    FOREIGN KEY (book_id) REFERENCES Books(book_id)
+                )
+            """)
+            
+            print("Database 'alx_book_store' created successfully!")
+            
     except Error as e:
         print(f"Error: {e}")
-
     finally:
-        # Close the connection
         if connection.is_connected():
             cursor.close()
             connection.close()
