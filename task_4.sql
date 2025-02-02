@@ -1,15 +1,16 @@
--- task_4.sql
--- Prints the full description of the books table in the alx_book_store database
+-- Use the provided database name
+USE alx_book_store;
 
-SELECT
+-- Query the INFORMATION_SCHEMA.COLUMNS to get the full description of the books table
+SELECT 
     COLUMN_NAME AS 'Field',
     COLUMN_TYPE AS 'Type',
     IS_NULLABLE AS 'Null',
     COLUMN_KEY AS 'Key',
     COLUMN_DEFAULT AS 'Default',
     EXTRA AS 'Extra'
-FROM
+FROM 
     INFORMATION_SCHEMA.COLUMNS
-WHERE
-    TABLE_SCHEMA = 'alx_book_store'
-    AND TABLE_NAME = 'books';
+WHERE 
+    TABLE_SCHEMA = DATABASE() AND
+    TABLE_NAME = 'books';
